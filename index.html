@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Análisis Rendimiento Académico - CASM & CCM | Sistema Completo</title>
+<title>Análisis Rendimiento Académico - CASM & CCM</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
   --orange:#E8520A;--orange-light:#FF6B2B;--orange-bg:#FFF1EB;--orange-border:#FBBF9A;
@@ -27,7 +25,18 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1A5CB808 0%,#E8520A06 40%,#6621C205 100%);pointer-events:none;z-index:0;}
 .container{max-width:1400px;margin:0 auto;position:relative;z-index:1;}
 
-/* HEADER */
+#loginOverlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center}
+#loginBox{background:#fff;border-radius:18px;padding:36px;max-width:420px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.4);text-align:center}
+#loginBox h2{margin:0 0 4px 0;font-size:1.5rem;color:#111;font-weight:800}
+#loginBox p{margin:0 0 24px 0;color:#666;font-size:0.9rem}
+.login-field{text-align:left;margin-bottom:16px}
+.login-field label{display:block;font-size:0.75rem;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.login-field input{width:100%;padding:12px 14px;border:2px solid #ddd;border-radius:10px;font-size:1rem;box-sizing:border-box;font-family:inherit}
+.login-field input:focus{outline:none;border-color:#E8520A}
+#loginBtn{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#E8520A,#FF7340);color:#fff;font-weight:700;font-size:1.05rem;cursor:pointer;font-family:inherit;margin-top:6px}
+#loginBtn:hover{opacity:0.9}
+#loginErr{color:#c00;font-size:0.9rem;font-weight:700;margin-top:12px;display:none}
+
 .header{background:var(--card);border-radius:var(--radius);padding:24px 32px;margin-bottom:24px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:relative;overflow:hidden}
 .header::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#E8520A,#1A5CB8,#6621C2,#0B8B42)}
 .header-left{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
@@ -35,7 +44,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .header-title p{color:var(--text-soft);font-size:0.9rem;margin-top:4px;font-weight:500}
 .header-actions{display:flex;gap:10px;flex-wrap:wrap}
 
-/* BUTTONS */
 .btn{padding:11px 22px;border-radius:var(--radius-sm);border:none;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s ease;display:inline-flex;align-items:center;gap:8px;letter-spacing:0.2px}
 .btn-primary{background:linear-gradient(135deg,#E8520A,#FF7340);color:white;box-shadow:0 4px 14px rgba(232,82,10,0.40)}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,82,10,0.50)}
@@ -47,20 +55,20 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .btn-green:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(11,139,66,0.50)}
 .btn-purple{background:linear-gradient(135deg,#6621C2,#7C3AED);color:white;box-shadow:0 4px 14px rgba(102,33,194,0.40)}
 .btn-purple:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(102,33,194,0.50)}
-.btn-icon{width:18px;height:18px}
+.btn-red{background:linear-gradient(135deg,#C41C1C,#DC2626);color:white;box-shadow:0 4px 14px rgba(196,28,28,0.40)}
+.btn-red:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(196,28,28,0.50)}
+.btn-amber{background:linear-gradient(135deg,#B45309,#D97706);color:white;box-shadow:0 4px 14px rgba(180,83,9,0.40)}
+.btn-amber:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(180,83,9,0.50)}
 
-/* NAV */
 .nav-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .nav-tab{padding:12px 24px;border-radius:var(--radius-sm);border:2px solid var(--border);background:white;cursor:pointer;font-weight:700;font-size:0.9rem;transition:all 0.2s}
 .nav-tab.active{background:linear-gradient(135deg,#E8520A,#FF7340);color:white;border-color:var(--orange);box-shadow:0 4px 14px rgba(232,82,10,0.30)}
 .nav-tab:hover:not(.active){border-color:var(--orange);background:var(--orange-bg)}
 
-/* CARDS */
 .card{background:var(--card);border-radius:var(--radius);padding:28px;margin-bottom:20px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05)}
 .card-title{font-size:1.2rem;font-weight:700;color:var(--text-dark);margin-bottom:20px;display:flex;align-items:center;gap:10px}
 .card-title .icon{width:34px;height:34px;background:linear-gradient(135deg,#E8520A,#FF7340);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 10px rgba(232,82,10,0.35);color:white}
 
-/* STATS GRID */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
 .stat-card{background:var(--card);border-radius:var(--radius-sm);padding:20px;box-shadow:var(--shadow-sm);border-left:4px solid var(--orange);transition:all 0.2s}
 .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
@@ -75,7 +83,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .stat-change.positive{color:var(--green)}
 .stat-change.negative{color:var(--red)}
 
-/* TABLE */
 .data-table{width:100%;border-collapse:separate;border-spacing:0 4px;margin-bottom:20px}
 .data-table th{background:linear-gradient(135deg,#1A5CB8,#2172DF);color:white;padding:13px 14px;text-align:left;font-weight:700;font-size:0.85rem;letter-spacing:0.3px}
 .data-table th:first-child{border-radius:10px 0 0 10px}
@@ -86,7 +93,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .data-table tbody tr td:first-child{border-radius:8px 0 0 8px}
 .data-table tbody tr td:last-child{border-radius:0 8px 8px 0}
 
-/* BADGES */
 .level-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:800;letter-spacing:0.3px}
 .level-regular{background:var(--amber-bg);color:#78350F;border:1px solid #FCD34D}
 .level-satisfactory{background:var(--blue-bg);color:#1E3A8A;border:1px solid #93BBF5}
@@ -94,45 +100,37 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .level-advanced{background:var(--purple-bg);color:#4C1D95;border:1px solid #C4B5FD}
 .level-low{background:var(--red-bg);color:#991B1B;border:1px solid #FCA5A5}
 
-/* CHARTS */
 .chart-container{position:relative;height:300px;margin:20px 0}
 .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;margin-top:20px}
 
-/* FILTERS */
 .filter-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
 .filter-bar select,.filter-bar input{padding:10px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:0.9rem;font-weight:600;background:white}
 .filter-bar select:focus,.filter-bar input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px rgba(232,82,10,0.12)}
 
-/* PROGRESS */
 .progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:8px}
 .progress-fill{height:100%;background:linear-gradient(90deg,#E8520A,#1A5CB8,#6621C2);border-radius:4px;transition:width 0.5s ease}
 
-/* SEARCH */
 .search-box{position:relative;flex:1;max-width:400px}
 .search-box input{width:100%;padding:10px 16px 10px 40px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:0.9rem}
 .search-box::before{content:"🔍";position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem}
 
-/* MODAL */
 .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(5px)}
 .modal-overlay.active{display:flex}
-.modal{background:var(--card);border-radius:var(--radius);padding:32px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal{background:var(--card);border-radius:var(--radius);padding:32px;max-width:800px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .modal-title{font-size:1.3rem;font-weight:800}
 .modal-close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-soft)}
 
-/* TABS CONTENT */
 .tab-content{display:none}
 .tab-content.active{display:block;animation:fadeIn 0.3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* FORM */
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
 .input-group{display:flex;flex-direction:column;gap:6px}
 .input-group label{font-weight:700;font-size:0.78rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.6px}
-.input-group input,.input-group select{padding:11px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;font-weight:500;transition:all 0.2s;background:var(--bg)}
-.input-group input:focus,.input-group select:focus{outline:none;border-color:var(--orange);background:white;box-shadow:0 0 0 4px rgba(232,82,10,0.12)}
+.input-group input,.input-group select,.input-group textarea{padding:11px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;font-weight:500;transition:all 0.2s;background:var(--bg);font-family:inherit}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{outline:none;border-color:var(--orange);background:white;box-shadow:0 0 0 4px rgba(232,82,10,0.12)}
 
-/* TOAST */
 .toast{position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);display:none;align-items:center;gap:12px;z-index:1000;animation:slideIn 0.3s ease;font-weight:700;font-size:0.9rem;color:white}
 .toast.show{display:flex}
 .toast.success{background:linear-gradient(135deg,#0B8B42,#16A34A)}
@@ -140,21 +138,10 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .toast.info{background:linear-gradient(135deg,#1A5CB8,#2172DF)}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* COMPARISON TABLE */
-.comparison-table{font-size:0.85rem}
-.comparison-table td{padding:8px 12px}
-.comparison-table .student-name{font-weight:700;color:var(--text-dark)}
-.comparison-table .grade-cell{font-weight:800;font-size:1rem}
-
-/* DASHBOARD CARDS */
 .dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 .dashboard-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05)}
 .dashboard-card h3{font-size:1.05rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
 
-/* EXPORT SECTION */
-.export-options{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-
-/* RESPONSIVE */
 @media(max-width:768px){
   .header{flex-direction:column;text-align:center}
   .stats-grid{grid-template-columns:1fr 1fr}
@@ -164,17 +151,143 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 }
 
 .hidden{display:none !important}
+
+.subject-card{background:white;border-radius:var(--radius-sm);border:2px solid var(--border);margin-bottom:16px;overflow:hidden}
+.subject-card-header{background:var(--blue-bg);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--blue-border)}
+.subject-card-header h4{font-size:1.05rem;font-weight:800;color:var(--blue);display:flex;align-items:center;gap:8px}
+.subject-card-header .subject-avg{background:white;padding:6px 14px;border-radius:20px;font-weight:800;font-size:0.9rem;color:var(--green);border:2px solid var(--green-border)}
+.parcial-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bg);align-items:center}
+.parcial-row:last-child{border-bottom:none}
+.parcial-row.header-row{background:#f8fafc;font-weight:700;font-size:0.8rem;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.5px}
+.parcial-grade{font-weight:900;font-size:1.1rem}
+.parcial-grade.excellent{color:var(--purple)}
+.parcial-grade.good{color:var(--green)}
+.parcial-grade.average{color:var(--blue)}
+.parcial-grade.low{color:var(--amber)}
+.parcial-grade.failing{color:var(--red)}
+.parcial-input-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;padding:10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:8px;align-items:end}
+.parcial-input-row .input-group{margin:0}
+.parcial-input-row .input-group label{font-size:0.7rem}
+.parcial-input-row .input-group input,.parcial-input-row .input-group select{padding:8px 10px;font-size:0.9rem}
+.month-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:0.8rem;font-weight:700;background:var(--purple-bg);color:var(--purple)}
+
+/* ESTILOS PARA LA HOJA DE RESULTADOS (PDF) */
+.report-card{background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-lg);border:1px solid rgba(0,0,0,0.05);max-width:800px;margin:0 auto}
+.report-header{text-align:center;padding-bottom:24px;border-bottom:3px solid var(--blue-bg);margin-bottom:24px}
+.report-header h2{font-size:1.8rem;font-weight:800;color:var(--text-dark);margin-bottom:8px}
+.report-header .school-name{color:var(--blue);font-weight:700;font-size:1.1rem}
+.report-header .report-date{color:var(--text-soft);font-size:0.9rem;margin-top:4px}
+
+/* LOGOS EN LA HOJA DE RESULTADOS */
+.report-logos{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:16px;background:var(--bg);border-radius:var(--radius-sm);gap:16px}
+.report-logo{width:100px;height:auto;object-fit:contain;max-height:80px}
+.report-logo-center{text-align:center;flex:1}
+
+.student-profile{display:flex;align-items:center;gap:20px;padding:20px;background:var(--blue-bg);border-radius:var(--radius-sm);margin-bottom:24px}
+.student-avatar{width:80px;height:80px;background:linear-gradient(135deg,var(--blue),var(--blue-light));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:2rem;font-weight:800;box-shadow:0 4px 12px rgba(26,92,184,0.3)}
+.student-info h3{font-size:1.4rem;font-weight:800;color:var(--text-dark);margin-bottom:4px}
+.student-info p{color:var(--text-soft);font-size:0.95rem}
+.score-display{display:flex;gap:16px;margin-bottom:24px}
+.score-box{flex:1;text-align:center;padding:20px;border-radius:var(--radius-sm);background:white;box-shadow:var(--shadow-sm)}
+.score-box .score-value{font-size:2.5rem;font-weight:900;line-height:1}
+.score-box .score-label{font-size:0.8rem;color:var(--text-soft);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:8px}
+.score-box.primary{border-top:4px solid var(--blue)}
+.score-box.primary .score-value{color:var(--blue)}
+.score-box.secondary{border-top:4px solid var(--green)}
+.score-box.secondary .score-value{color:var(--green)}
+.score-box.tertiary{border-top:4px solid var(--purple)}
+.score-box.tertiary .score-value{color:var(--purple)}
+.section-box{margin-bottom:20px;padding:20px;border-radius:var(--radius-sm);background:white;box-shadow:var(--shadow-sm);border-left:4px solid var(--green)}
+.section-box.warning{border-left-color:var(--amber)}
+.section-box.danger{border-left-color:var(--red)}
+.section-box.info{border-left-color:var(--blue)}
+.section-box h4{font-size:1.1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-box ul{margin:0;padding-left:20px}
+.section-box li{margin-bottom:8px;color:var(--text-med);line-height:1.5}
+.section-box .highlight{background:var(--green-bg);padding:2px 8px;border-radius:4px;font-weight:700;color:var(--green)}
+.section-box.warning .highlight{background:var(--amber-bg);color:var(--amber)}
+.section-box.danger .highlight{background:var(--red-bg);color:var(--red)}
+.subject-detail-table{width:100%;border-collapse:collapse;margin-top:12px}
+.subject-detail-table th{background:var(--blue-bg);color:var(--blue);padding:10px 12px;text-align:left;font-weight:700;font-size:0.85rem}
+.subject-detail-table td{padding:10px 12px;border-bottom:1px solid var(--bg);font-size:0.9rem}
+.subject-detail-table .grade-cell{font-weight:800;text-align:center}
+.grade-excellent{color:var(--purple)}
+.grade-good{color:var(--green)}
+.grade-average{color:var(--blue)}
+.grade-low{color:var(--amber)}
+.grade-failing{color:var(--red)}
+.report-footer{text-align:center;padding-top:24px;border-top:2px solid var(--bg);margin-top:24px;color:var(--text-soft);font-size:0.85rem}
+
+/* SECCIÓN DEL ANALISTA EN RESULTADOS */
+.analyst-section{margin-top:24px;padding:20px;background:var(--orange-bg);border-radius:var(--radius-sm);border:2px solid var(--orange-border)}
+.analyst-section h4{color:var(--orange);margin-bottom:12px}
+.analyst-info{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+.analyst-comment{min-height:80px;padding:12px;background:white;border-radius:var(--radius-xs);border:1px solid var(--orange-border);font-size:0.9rem;line-height:1.6}
+
+/* DATOS DEL ESTUDIANTE Y ANALISTA EN FORMULARIO */
+.student-data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;padding:16px;background:var(--blue-bg);border-radius:var(--radius-sm);border:2px solid var(--blue-border)}
+.analyst-data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:16px;padding:16px;background:var(--orange-bg);border-radius:var(--radius-sm);border:2px solid var(--orange-border)}
+.data-section-title{font-size:1rem;font-weight:700;color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.analyst-section-title{font-size:1rem;font-weight:700;color:var(--orange);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+.download-btn{background:linear-gradient(135deg,#0B8B42,#16A34A);color:white;padding:12px 24px;border-radius:var(--radius-sm);border:none;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:0.95rem;margin-top:16px;box-shadow:0 4px 14px rgba(11,139,66,0.40)}
+.download-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(11,139,66,0.50)}
+
+@media print{
+  body{background:white;padding:0}
+  .container,.header,.nav-tabs,.modal-overlay{display:none !important}
+  #loginOverlay{display:none !important}
+  #studentReportView{display:block !important;position:static}
+  .report-card{box-shadow:none;border:1px solid #ddd}
+  .report-actions{display:none !important}
+}
+
+#studentReportView{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:20000;overflow-y:auto;padding:20px}
+#studentReportView.active{display:block}
+.report-actions{display:flex;gap:12px;justify-content:center;margin-bottom:20px;position:sticky;top:0;background:var(--bg);padding:12px;z-index:10}
+.parcial-timeline{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.parcial-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.75rem;color:white;position:relative}
+.parcial-dot::after{content:attr(data-month);position:absolute;bottom:-18px;font-size:0.6rem;font-weight:600;color:var(--text-soft);white-space:nowrap}
+.parcial-dot.excellent{background:var(--purple)}
+.parcial-dot.good{background:var(--green)}
+.parcial-dot.average{background:var(--blue)}
+.parcial-dot.low{background:var(--amber)}
+.parcial-dot.failing{background:var(--red)}
+.update-btn{background:linear-gradient(135deg,#B45309,#D97706);color:white;padding:6px 14px;border-radius:var(--radius-sm);border:none;font-weight:700;cursor:pointer;font-size:0.8rem;display:inline-flex;align-items:center;gap:6px}
+.update-btn:hover{opacity:0.9}
+.update-subject-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.update-subject-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg);border-radius:var(--radius-sm);border:2px solid var(--border);cursor:pointer;transition:all 0.2s}
+.update-subject-item:hover{border-color:var(--orange);background:var(--orange-bg)}
+.update-subject-item.selected{border-color:var(--green);background:var(--green-bg)}
 </style>
 <base target="_blank">
 </head>
 <body>
+
+<div id="loginOverlay">
+  <div id="loginBox">
+    <div style="width:60px;height:60px;background:linear-gradient(135deg,#E8520A,#FF7340);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem;color:white">🔐</div>
+    <h2>Inicio de Sesion</h2>
+    <p>Sistema de Rendimiento Academico - CASM & CCM</p>
+    <div class="login-field">
+      <label>Usuario</label>
+      <input type="text" id="loginUser" placeholder="Ingrese usuario" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Contrasena</label>
+      <input type="password" id="loginPass" placeholder="Ingrese contrasena" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="loginErr">❌ Usuario o contrasena incorrectos</div>
+    <button id="loginBtn" onclick="doLogin()">Ingresar al Sistema</button>
+  </div>
+</div>
+
 <div class="container">
-  <!-- HEADER -->
   <div class="header">
     <div class="header-left">
       <div class="header-title">
-        <h1>📊 Análisis Rendimiento Académico</h1>
-        <p>CASM & CCM - Sistema de Gestión Escolar con Análisis Global</p>
+        <h1>📊 Analisis Rendimiento Academico</h1>
+        <p>CASM & CCM - Sistema de Gestion Escolar</p>
       </div>
     </div>
     <div class="header-actions">
@@ -186,36 +299,28 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
     </div>
   </div>
 
-  <!-- NAV TABS -->
   <div class="nav-tabs">
-    <div class="nav-tab active" onclick="switchTab('dashboard')" id="tab-dashboard">📈 Dashboard Global</div>
-    <div class="nav-tab" onclick="switchTab('students')" id="tab-students">👥 Gestión de Estudiantes</div>
-    <div class="nav-tab" onclick="switchTab('analysis')" id="tab-analysis">📊 Análisis Detallado</div>
+    <div class="nav-tab active" onclick="switchTab('dashboard')" id="tab-dashboard">📈 Dashboard</div>
+    <div class="nav-tab" onclick="switchTab('students')" id="tab-students">👥 Estudiantes</div>
+    <div class="nav-tab" onclick="switchTab('analysis')" id="tab-analysis">📊 Analisis</div>
     <div class="nav-tab" onclick="switchTab('comparison')" id="tab-comparison">🔍 Comparativa</div>
   </div>
 
-  <!-- DASHBOARD TAB -->
   <div class="tab-content active" id="content-dashboard">
-    <!-- STATS OVERVIEW -->
-    <div class="stats-grid" id="statsGrid">
-      <!-- Se llena dinámicamente -->
-    </div>
-
-    <!-- CHARTS -->
+    <div class="stats-grid" id="statsGrid"></div>
     <div class="chart-grid">
       <div class="card">
-        <div class="card-title"><span class="icon">📊</span> Distribución por Nivel de Rendimiento</div>
+        <div class="card-title"><span class="icon">📊</span> Distribucion por Nivel</div>
         <div class="chart-container"><canvas id="levelChart"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title"><span class="icon">📈</span> Promedio General por Sección</div>
+        <div class="card-title"><span class="icon">📈</span> Distribucion de Indices</div>
         <div class="chart-container"><canvas id="sectionChart"></canvas></div>
       </div>
     </div>
-
     <div class="chart-grid">
       <div class="card">
-        <div class="card-title"><span class="icon">🎯</span> Comparativa de Índices</div>
+        <div class="card-title"><span class="icon">🎯</span> Comparativa de Indices</div>
         <div class="chart-container"><canvas id="indexChart"></canvas></div>
       </div>
       <div class="card">
@@ -223,8 +328,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
         <div class="chart-container"><canvas id="trendChart"></canvas></div>
       </div>
     </div>
-
-    <!-- RECENT STUDENTS -->
     <div class="card">
       <div class="card-title"><span class="icon">👥</span> Estudiantes Recientes</div>
       <div class="filter-bar">
@@ -241,24 +344,12 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
         </select>
       </div>
       <table class="data-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Sección</th>
-            <th>Parcial</th>
-            <th>Índice</th>
-            <th>Nivel</th>
-            <th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody id="recentStudentsTable">
-          <!-- Se llena dinámicamente -->
-        </tbody>
+        <thead><tr><th>Nombre</th><th>Parciales</th><th>Indice</th><th>Nivel</th><th>Asignaturas</th><th>Ultima Actualizacion</th></tr></thead>
+        <tbody id="recentStudentsTable"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- STUDENTS TAB -->
   <div class="tab-content" id="content-students">
     <div class="card">
       <div class="card-title"><span class="icon">👥</span> Todos los Estudiantes</div>
@@ -266,12 +357,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
         <div class="search-box">
           <input type="text" id="studentSearch" placeholder="Buscar por nombre..." oninput="filterStudents()">
         </div>
-        <select id="studentFilterSection" onchange="filterStudents()">
-          <option value="">Todas las secciones</option>
-          <option value="A">Sección A</option>
-          <option value="B">Sección B</option>
-          <option value="C">Sección C</option>
-        </select>
         <select id="studentFilterLevel" onchange="filterStudents()">
           <option value="">Todos los niveles</option>
           <option value="advanced">Avanzado</option>
@@ -283,34 +368,20 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
         <button class="btn btn-red" onclick="clearAllData()" style="margin-left:auto">🗑️ Limpiar Todo</button>
       </div>
       <table class="data-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Sección</th>
-            <th>Parcial</th>
-            <th>Índice</th>
-            <th>Nivel</th>
-            <th>Materias</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="allStudentsTable">
-          <!-- Se llena dinámicamente -->
-        </tbody>
+        <thead><tr><th>ID</th><th>Nombre</th><th>Parciales Reg.</th><th>Indice General</th><th>Nivel</th><th>Asignaturas</th><th>Acciones</th></tr></thead>
+        <tbody id="allStudentsTable"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ANALYSIS TAB -->
   <div class="tab-content" id="content-analysis">
     <div class="dashboard-grid">
       <div class="dashboard-card">
-        <h3>🎯 Distribución por Nivel</h3>
+        <h3>🎯 Distribucion por Nivel</h3>
         <div id="levelDistribution"></div>
       </div>
       <div class="dashboard-card">
-        <h3>📊 Estadísticas por Sección</h3>
+        <h3>📊 Estadisticas Generales</h3>
         <div id="sectionStats"></div>
       </div>
       <div class="dashboard-card">
@@ -324,17 +395,12 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
     </div>
   </div>
 
-  <!-- COMPARISON TAB -->
   <div class="tab-content" id="content-comparison">
     <div class="card">
       <div class="card-title"><span class="icon">🔍</span> Comparativa de Estudiantes</div>
       <div class="filter-bar">
-        <select id="compareStudent1" onchange="updateComparison()">
-          <option value="">Seleccionar estudiante 1</option>
-        </select>
-        <select id="compareStudent2" onchange="updateComparison()">
-          <option value="">Seleccionar estudiante 2</option>
-        </select>
+        <select id="compareStudent1" onchange="updateComparison()"><option value="">Seleccionar estudiante 1</option></select>
+        <select id="compareStudent2" onchange="updateComparison()"><option value="">Seleccionar estudiante 2</option></select>
         <button class="btn btn-blue" onclick="compareAll()">📊 Comparar Todos</button>
       </div>
       <div id="comparisonResult"></div>
@@ -342,38 +408,50 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
   </div>
 </div>
 
-<!-- MODAL: NUEVO ESTUDIANTE -->
 <div class="modal-overlay" id="newStudentModal">
-  <div class="modal">
+  <div class="modal" style="max-width:900px;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
       <div class="modal-title">➕ Nuevo Registro de Estudiante</div>
       <button class="modal-close" onclick="hideModal('newStudentModal')">&times;</button>
     </div>
-    <div class="form-grid">
-      <div class="input-group">
-        <label>Nombre Completo</label>
-        <input type="text" id="newName" placeholder="Ej: Juan Pérez">
+    <!-- DATOS DEL ESTUDIANTE -->
+    <div style="margin-bottom:20px">
+      <div class="data-section-title">👤 Datos del Estudiante</div>
+      <div class="student-data-grid">
+        <div class="input-group"><label>Nombre Completo</label><input type="text" id="newName" placeholder="Ej: Juan Perez"></div>
+        <div class="input-group"><label>Edad</label><input type="number" id="newAge" min="5" max="25" placeholder="Ej: 15"></div>
+        <div class="input-group"><label>Grado / Año</label><input type="text" id="newGrade" placeholder="Ej: 10° A"></div>
+        <div class="input-group"><label>Centro Educativo</label><input type="text" id="newSchool" placeholder="Ej: Instituto Nacional"></div>
       </div>
-      <div class="input-group">
-        <label>Sección</label>
-        <select id="newSection">
-          <option value="A">Sección A</option>
-          <option value="B">Sección B</option>
-          <option value="C">Sección C</option>
-        </select>
+    </div>
+    <!-- DATOS DE QUIEN LLENA LA FICHA -->
+    <div style="margin-bottom:20px">
+      <div class="analyst-section-title">📝 Datos de quien llena la ficha</div>
+      <div class="analyst-data-grid">
+        <div class="input-group"><label>Nombre del Analista</label><input type="text" id="newAnalystName" placeholder="Ej: Maria Garcia"></div>
+        <div class="input-group"><label>Cargo / Rol</label><input type="text" id="newAnalystRole" placeholder="Ej: Orientadora Educativa"></div>
       </div>
-      <div class="input-group">
-        <label>Parcial</label>
-        <select id="newParcial">
-          <option value="1">1er Parcial</option>
-          <option value="2">2do Parcial</option>
-          <option value="3">3er Parcial</option>
-          <option value="4">4to Parcial</option>
-        </select>
+    </div>
+    <!-- COMENTARIOS DEL ANALISTA -->
+    <div style="margin-bottom:20px">
+      <div class="analyst-section-title">💬 Comentarios del Analista</div>
+      <div class="input-group" style="margin-top:8px">
+        <textarea id="newAnalystComment" rows="4" placeholder="Escriba aqui sus observaciones y comentarios sobre el estudiante..." style="width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:0.95rem;font-family:inherit;resize:vertical;min-height:80px"></textarea>
       </div>
-      <div class="input-group">
-        <label>Índice (0-100)</label>
-        <input type="number" id="newIndex" min="0" max="100" placeholder="Ej: 85">
+    </div>
+    <!-- ASIGNATURAS Y PARCIALES -->
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:2px solid var(--green-bg);padding-bottom:6px">
+        <h3 style="font-size:1rem;color:var(--green)">📚 Asignaturas y Parciales</h3>
+        <button class="btn btn-green" style="padding:6px 14px;font-size:0.8rem" onclick="addSubjectCard()">➕ Agregar Asignatura</button>
+      </div>
+      <div id="subjectsContainer" style="display:flex;flex-direction:column;gap:16px"></div>
+      <div id="subjectsSummary" style="margin-top:16px;padding:16px;background:var(--green-bg);border-radius:var(--radius-sm);display:none;border:2px solid var(--green-border)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:700;color:var(--green)">📊 Indice Academico General:</span>
+          <span id="calculatedAverage" style="font-size:2rem;font-weight:900;color:var(--green)">0.00</span>
+        </div>
+        <div style="font-size:0.85rem;color:var(--text-soft);margin-top:4px">Promedio de todos los promedios por asignatura</div>
       </div>
     </div>
     <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">
@@ -383,758 +461,845 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
   </div>
 </div>
 
-<!-- TOAST -->
+<div class="modal-overlay" id="updateStudentModal">
+  <div class="modal" style="max-width:800px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <div class="modal-title">🔄 Actualizar Notas del Estudiante</div>
+      <button class="modal-close" onclick="hideModal('updateStudentModal')">&times;</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <h3 style="font-size:1rem;color:var(--blue);margin-bottom:8px" id="updateStudentName">Estudiante</h3>
+      <p style="color:var(--text-soft);font-size:0.85rem">Seleccione la asignatura para agregar un nuevo parcial, o agregue una nueva asignatura.</p>
+    </div>
+    <div style="margin-bottom:16px">
+      <h4 style="font-size:0.9rem;color:var(--text-soft);margin-bottom:10px">📚 Asignaturas Existentes</h4>
+      <div id="updateSubjectList" class="update-subject-list"></div>
+    </div>
+    <div id="updateParcialForm" style="display:none;margin-bottom:20px;padding:16px;background:var(--bg);border-radius:var(--radius-sm);border:2px solid var(--orange-border)">
+      <h4 style="font-size:0.95rem;color:var(--orange);margin-bottom:12px">➕ Agregar Parcial a: <span id="updateSubjectName"></span></h4>
+      <div class="parcial-input-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="input-group"><label>Numero de Parcial</label><select id="updateParcialNum"><option value="1">1er Parcial</option><option value="2">2do Parcial</option><option value="3">3er Parcial</option><option value="4">4to Parcial</option></select></div>
+        <div class="input-group"><label>Mes</label><select id="updateParcialMonth"><option value="Enero">Enero</option><option value="Febrero">Febrero</option><option value="Marzo">Marzo</option><option value="Abril">Abril</option><option value="Mayo">Mayo</option><option value="Junio">Junio</option><option value="Julio">Julio</option><option value="Agosto">Agosto</option><option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option><option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option></select></div>
+        <div class="input-group"><label>Nota (0-100)</label><input type="number" id="updateParcialGrade" min="0" max="100" placeholder="0-100"></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="saveUpdatedParcial()">💾 Guardar Parcial</button>
+    </div>
+    <div style="border-top:2px solid var(--green-bg);padding-top:16px;margin-top:16px">
+      <h4 style="font-size:0.9rem;color:var(--green);margin-bottom:10px">➕ Nueva Asignatura</h4>
+      <div class="parcial-input-row" style="grid-template-columns:2fr 1fr 1fr 1fr auto">
+        <div class="input-group"><label>Nombre de Asignatura</label><input type="text" id="newUpdateSubjectName" placeholder="Ej: Matematicas"></div>
+        <div class="input-group"><label>Parcial</label><select id="newUpdateParcialNum"><option value="1">1er</option><option value="2">2do</option><option value="3">3er</option><option value="4">4to</option></select></div>
+        <div class="input-group"><label>Mes</label><select id="newUpdateParcialMonth"><option value="Enero">Enero</option><option value="Febrero">Febrero</option><option value="Marzo">Marzo</option><option value="Abril">Abril</option><option value="Mayo">Mayo</option><option value="Junio">Junio</option><option value="Julio">Julio</option><option value="Agosto">Agosto</option><option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option><option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option></select></div>
+        <div class="input-group"><label>Nota</label><input type="number" id="newUpdateParcialGrade" min="0" max="100" placeholder="0-100"></div>
+        <button class="btn btn-green" style="height:fit-content;padding:10px 14px" onclick="saveNewSubjectToStudent()">➕ Agregar</button>
+      </div>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="hideModal('updateStudentModal')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
+<div id="studentReportView">
+  <div class="report-actions">
+    <button class="btn btn-secondary" onclick="closeReportView()">← Volver</button>
+    <button class="download-btn" onclick="downloadReportPDF()">📄 Descargar PDF para Padres</button>
+  </div>
+  <div id="reportContent"></div>
+</div>
+
 <script>
-// ==================== BASE DE DATOS LOCAL (IndexedDB) ====================
-class StudentDB {
-  constructor() {
-    this.dbName = 'CASM_CCM_Database';
-    this.dbVersion = 1;
-    this.db = null;
-  }
+// ============================================
+// CONFIGURACIÓN DE LOGOS - CASM Y CCM
+// ============================================
+// NOTA: Reemplaza estas URLs con las rutas correctas de tus logos
+// Puedes usar base64 o rutas relativas a los archivos
 
-  async init() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.dbVersion);
+var LOGO_CASM_URL = 'logo cas.png';  // Logo CASM - archivo adjunto
+var LOGO_CCM_URL = 'logo ccm.jpg';   // Logo CCM - archivo adjunto
 
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve(this.db);
-      };
+// Alternativa: Si los logos están en una carpeta:
+// var LOGO_CASM_URL = './logos/logo-casm.png';
+// var LOGO_CCM_URL = './logos/logo-ccm.jpg';
 
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
+// ============================================
+// CREDENCIALES DE ACCESO
+// ============================================
+var LOGIN_USER = 'CASMCENTRAL';
+var LOGIN_PASS = 'casm123';
 
-        // Store para estudiantes
-        if (!db.objectStoreNames.contains('students')) {
-          const store = db.createObjectStore('students', { keyPath: 'id', autoIncrement: true });
-          store.createIndex('name', 'name', { unique: false });
-          store.createIndex('section', 'section', { unique: false });
-          store.createIndex('level', 'level', { unique: false });
-          store.createIndex('date', 'date', { unique: false });
-        }
+// ============================================
+// DATOS Y ESTADO
+// ============================================
+var students = [];
+var currentId = 1;
+var charts = {};
+var updateStudentId = null;
+var selectedSubjectForUpdate = null;
 
-        // Store para configuración
-        if (!db.objectStoreNames.contains('config')) {
-          db.createObjectStore('config', { keyPath: 'key' });
-        }
-      };
-    });
-  }
+// ============================================
+// FUNCIONES DE UTILIDAD
+// ============================================
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || 'info');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
 
-  async addStudent(student) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(['students'], 'readwrite');
-      const store = tx.objectStore('students');
-      student.date = new Date().toISOString();
-      const request = store.add(student);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
+function showModal(id) { document.getElementById(id).classList.add('active'); }
+function hideModal(id) { document.getElementById(id).classList.remove('active'); }
 
-  async getAllStudents() {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(['students'], 'readonly');
-      const store = tx.objectStore('students');
-      const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('content-' + tab).classList.add('active');
+  if(tab === 'dashboard') renderDashboard();
+  if(tab === 'students') renderAllStudents();
+  if(tab === 'analysis') renderAnalysis();
+  if(tab === 'comparison') renderComparison();
+}
 
-  async deleteStudent(id) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(['students'], 'readwrite');
-      const store = tx.objectStore('students');
-      const request = store.delete(id);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async clearAll() {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(['students'], 'readwrite');
-      const store = tx.objectStore('students');
-      const request = store.clear();
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async getStats() {
-    const students = await this.getAllStudents();
-    const stats = {
-      total: students.length,
-      advanced: 0,
-      verySatisfactory: 0,
-      satisfactory: 0,
-      regular: 0,
-      low: 0,
-      averageIndex: 0,
-      bySection: { A: [], B: [], C: [] }
-    };
-
-    let totalIndex = 0;
-    students.forEach(s => {
-      stats[s.level] = (stats[s.level] || 0) + 1;
-      totalIndex += s.index;
-      if (s.section) stats.bySection[s.section].push(s);
-    });
-
-    stats.averageIndex = students.length > 0 ? (totalIndex / students.length).toFixed(2) : 0;
-    return stats;
+// ============================================
+// LOGIN
+// ============================================
+function doLogin() {
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPass').value.trim();
+  var err = document.getElementById('loginErr');
+  if(u === LOGIN_USER && p === LOGIN_PASS) {
+    document.getElementById('loginOverlay').style.display = 'none';
+    err.style.display = 'none';
+    showToast('✅ Bienvenido al Sistema CASM & CCM', 'success');
+    initApp();
+  } else {
+    err.style.display = 'block';
+    showToast('❌ Credenciales incorrectas', 'error');
   }
 }
 
-// ==================== SISTEMA PRINCIPAL ====================
-const db = new StudentDB();
-let charts = {};
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', async () => {
-  await db.init();
-
-  // Cargar datos de ejemplo si está vacío
-  const students = await db.getAllStudents();
-  if (students.length === 0) {
-    await loadSampleData();
-  }
-
-  updateDashboard();
-  updateStudentsList();
-  updateAnalysis();
-  updateComparisonOptions();
-});
-
-// Datos de ejemplo
-async function loadSampleData() {
-  const sampleData = [
-    { name: "María González", section: "A", parcial: "1", index: 92, level: "advanced" },
-    { name: "Carlos Rodríguez", section: "A", parcial: "1", index: 78, level: "satisfactory" },
-    { name: "Ana Martínez", section: "B", parcial: "1", index: 85, level: "very-satisfactory" },
-    { name: "Luis Hernández", section: "B", parcial: "2", index: 65, level: "regular" },
-    { name: "Sofía López", section: "C", parcial: "1", index: 95, level: "advanced" },
-    { name: "Diego Torres", section: "C", parcial: "2", index: 72, level: "satisfactory" },
-    { name: "Valentina Ruiz", section: "A", parcial: "2", index: 88, level: "very-satisfactory" },
-    { name: "Mateo Silva", section: "B", parcial: "1", index: 58, level: "low" },
-    { name: "Camila Vega", section: "A", parcial: "3", index: 91, level: "advanced" },
-    { name: "Sebastián Cruz", section: "C", parcial: "3", index: 76, level: "satisfactory" }
-  ];
-
-  for (const student of sampleData) {
-    await db.addStudent(student);
-  }
-  showToast('Datos de ejemplo cargados', 'info');
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+function initApp() {
+  renderDashboard();
+  renderAllStudents();
+  renderAnalysis();
+  renderComparison();
 }
 
-// ==================== DASHBOARD ====================
-async function updateDashboard() {
-  const stats = await db.getStats();
-  const students = await db.getAllStudents();
-
-  // Stats grid
-  const statsGrid = document.getElementById('statsGrid');
-  statsGrid.innerHTML = `
-    <div class="stat-card">
-      <div class="stat-value">${stats.total}</div>
-      <div class="stat-label">Total Estudiantes</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-value">${stats.advanced}</div>
-      <div class="stat-label">Avanzado</div>
-      <div class="stat-change positive">${((stats.advanced/stats.total)*100).toFixed(1)}%</div>
-    </div>
-    <div class="stat-card blue">
-      <div class="stat-value">${stats.verySatisfactory}</div>
-      <div class="stat-label">Muy Satisfactorio</div>
-      <div class="stat-change positive">${((stats.verySatisfactory/stats.total)*100).toFixed(1)}%</div>
-    </div>
-    <div class="stat-card purple">
-      <div class="stat-value">${stats.satisfactory}</div>
-      <div class="stat-label">Satisfactorio</div>
-      <div class="stat-change positive">${((stats.satisfactory/stats.total)*100).toFixed(1)}%</div>
-    </div>
-    <div class="stat-card amber">
-      <div class="stat-value">${stats.regular}</div>
-      <div class="stat-label">Regular</div>
-      <div class="stat-change negative">${((stats.regular/stats.total)*100).toFixed(1)}%</div>
-    </div>
-    <div class="stat-card red">
-      <div class="stat-value">${stats.low}</div>
-      <div class="stat-label">Bajo</div>
-      <div class="stat-change negative">${((stats.low/stats.total)*100).toFixed(1)}%</div>
-    </div>
-    <div class="stat-card" style="border-left-color:var(--blue)">
-      <div class="stat-value">${stats.averageIndex}</div>
-      <div class="stat-label">Índice Promedio</div>
-    </div>
-  `;
-
-  // Charts
-  updateCharts(stats, students);
-
-  // Recent students table
-  updateRecentTable(students.slice(-10).reverse());
+// ============================================
+// RENDERIZADO DE ESTADÍSTICAS
+// ============================================
+function getLevelFromIndex(idx) {
+  if(idx >= 90) return {key:'advanced', label:'Avanzado', class:'level-advanced'};
+  if(idx >= 80) return {key:'very-satisfactory', label:'Muy Satisfactorio', class:'level-very-satisfactory'};
+  if(idx >= 70) return {key:'satisfactory', label:'Satisfactorio', class:'level-satisfactory'};
+  if(idx >= 60) return {key:'regular', label:'Regular', class:'level-regular'};
+  return {key:'low', label:'Bajo', class:'level-low'};
 }
 
-function updateCharts(stats, students) {
-  // Level Distribution Chart
-  const levelCtx = document.getElementById('levelChart');
-  if (charts.level) charts.level.destroy();
-  charts.level = new Chart(levelCtx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Avanzado', 'Muy Satisfactorio', 'Satisfactorio', 'Regular', 'Bajo'],
-      datasets: [{
-        data: [stats.advanced, stats.verySatisfactory, stats.satisfactory, stats.regular, stats.low],
-        backgroundColor: ['#6621C2', '#0B8B42', '#1A5CB8', '#B45309', '#C41C1C'],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom' }
-      }
+function calculateStudentIndex(student) {
+  if(!student.subjects || student.subjects.length === 0) return 0;
+  var total = 0, count = 0;
+  student.subjects.forEach(function(sub) {
+    if(sub.parciales && sub.parciales.length > 0) {
+      var subTotal = 0;
+      sub.parciales.forEach(function(p) { subTotal += parseFloat(p.grade); });
+      total += (subTotal / sub.parciales.length);
+      count++;
     }
   });
+  return count > 0 ? (total / count) : 0;
+}
 
-  // Section Chart
-  const sectionCtx = document.getElementById('sectionChart');
-  const sectionAvgs = {
-    A: stats.bySection.A.length > 0 ? (stats.bySection.A.reduce((a,b) => a + b.index, 0) / stats.bySection.A.length).toFixed(1) : 0,
-    B: stats.bySection.B.length > 0 ? (stats.bySection.B.reduce((a,b) => a + b.index, 0) / stats.bySection.B.length).toFixed(1) : 0,
-    C: stats.bySection.C.length > 0 ? (stats.bySection.C.reduce((a,b) => a + b.index, 0) / stats.bySection.C.length).toFixed(1) : 0
-  };
+function getTotalParciales(student) {
+  var count = 0;
+  if(student.subjects) {
+    student.subjects.forEach(function(s) { count += (s.parciales ? s.parciales.length : 0); });
+  }
+  return count;
+}
 
-  if (charts.section) charts.section.destroy();
-  charts.section = new Chart(sectionCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Sección A', 'Sección B', 'Sección C'],
-      datasets: [{
-        label: 'Índice Promedio',
-        data: [sectionAvgs.A, sectionAvgs.B, sectionAvgs.C],
-        backgroundColor: ['#E8520A', '#1A5CB8', '#6621C2'],
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: { beginAtZero: true, max: 100 }
-      }
-    }
+// ============================================
+// DASHBOARD
+// ============================================
+function renderDashboard() {
+  var stats = {total:0, advanced:0, verySat:0, satisfactory:0, regular:0, low:0, avgIndex:0};
+  students.forEach(function(s) {
+    stats.total++;
+    var idx = calculateStudentIndex(s);
+    stats.avgIndex += idx;
+    var lvl = getLevelFromIndex(idx);
+    if(lvl.key === 'advanced') stats.advanced++;
+    else if(lvl.key === 'very-satisfactory') stats.verySat++;
+    else if(lvl.key === 'satisfactory') stats.satisfactory++;
+    else if(lvl.key === 'regular') stats.regular++;
+    else stats.low++;
   });
+  if(stats.total > 0) stats.avgIndex = stats.avgIndex / stats.total;
 
-  // Index Chart (histogram)
-  const indexRanges = { '90-100': 0, '80-89': 0, '70-79': 0, '60-69': 0, '0-59': 0 };
-  students.forEach(s => {
-    if (s.index >= 90) indexRanges['90-100']++;
-    else if (s.index >= 80) indexRanges['80-89']++;
-    else if (s.index >= 70) indexRanges['70-79']++;
-    else if (s.index >= 60) indexRanges['60-69']++;
-    else indexRanges['0-59']++;
+  var html = '<div class="stat-card"><div class="stat-value">' + stats.total + '</div><div class="stat-label">Total Estudiantes</div></div>';
+  html += '<div class="stat-card purple"><div class="stat-value">' + stats.advanced + '</div><div class="stat-label">Avanzado</div></div>';
+  html += '<div class="stat-card green"><div class="stat-value">' + stats.verySat + '</div><div class="stat-label">Muy Satisfactorio</div></div>';
+  html += '<div class="stat-card blue"><div class="stat-value">' + stats.satisfactory + '</div><div class="stat-label">Satisfactorio</div></div>';
+  html += '<div class="stat-card amber"><div class="stat-value">' + stats.regular + '</div><div class="stat-label">Regular</div></div>';
+  html += '<div class="stat-card red"><div class="stat-value">' + stats.low + '</div><div class="stat-label">Bajo</div></div>';
+  document.getElementById('statsGrid').innerHTML = html;
+
+  // Gráficos (simplificados para el ejemplo)
+  renderCharts(stats);
+  renderRecentStudents();
+}
+
+function renderCharts(stats) {
+  // Implementación de gráficos con Chart.js
+  var ctx1 = document.getElementById('levelChart');
+  var ctx2 = document.getElementById('sectionChart');
+  var ctx3 = document.getElementById('indexChart');
+  var ctx4 = document.getElementById('trendChart');
+  
+  if(ctx1 && charts.level) charts.level.destroy();
+  if(ctx2 && charts.section) charts.section.destroy();
+  if(ctx3 && charts.index) charts.index.destroy();
+  if(ctx4 && charts.trend) charts.trend.destroy();
+
+  if(ctx1) {
+    charts.level = new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: ['Avanzado','Muy Sat.','Satisfactorio','Regular','Bajo'],
+        datasets: [{data:[stats.advanced,stats.verySat,stats.satisfactory,stats.regular,stats.low],backgroundColor:['#6621C2','#0B8B42','#1A5CB8','#B45309','#C41C1C']}]
+      },
+      options: {responsive:true,maintainAspectRatio:false}
+    });
+  }
+}
+
+function renderRecentStudents() {
+  var tbody = document.getElementById('recentStudentsTable');
+  var filter = document.getElementById('dashboardFilter').value;
+  var search = document.getElementById('dashboardSearch').value.toLowerCase();
+  
+  var list = students.slice().sort(function(a,b) { return b.id - a.id; }).slice(0, 10);
+  
+  var html = '';
+  list.forEach(function(s) {
+    var idx = calculateStudentIndex(s);
+    var lvl = getLevelFromIndex(idx);
+    if(filter && lvl.key !== filter) return;
+    if(search && s.name.toLowerCase().indexOf(search) === -1) return;
+    
+    var subjCount = s.subjects ? s.subjects.length : 0;
+    var parcCount = getTotalParciales(s);
+    
+    html += '<tr><td>' + s.name + '</td><td>' + parcCount + '</td><td>' + idx.toFixed(2) + '</td>';
+    html += '<td><span class="level-badge ' + lvl.class + '">' + lvl.label + '</span></td>';
+    html += '<td>' + subjCount + '</td><td>' + (s.lastUpdate || 'N/A') + '</td></tr>';
   });
+  tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:#999">No hay estudiantes registrados</td></tr>';
+}
 
-  if (charts.index) charts.index.destroy();
-  charts.index = new Chart(document.getElementById('indexChart'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(indexRanges),
-      datasets: [{
-        label: 'Cantidad de Estudiantes',
-        data: Object.values(indexRanges),
-        backgroundColor: ['#6621C2', '#0B8B42', '#1A5CB8', '#B45309', '#C41C1C'],
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
+function filterDashboard() { renderRecentStudents(); }
+
+// ============================================
+// ESTUDIANTES
+// ============================================
+function renderAllStudents() {
+  var tbody = document.getElementById('allStudentsTable');
+  var filter = document.getElementById('studentFilterLevel').value;
+  var search = document.getElementById('studentSearch').value.toLowerCase();
+  
+  var html = '';
+  students.forEach(function(s) {
+    var idx = calculateStudentIndex(s);
+    var lvl = getLevelFromIndex(idx);
+    if(filter && lvl.key !== filter) return;
+    if(search && s.name.toLowerCase().indexOf(search) === -1) return;
+    
+    var subjCount = s.subjects ? s.subjects.length : 0;
+    var parcCount = getTotalParciales(s);
+    
+    html += '<tr><td>#' + s.id + '</td><td>' + s.name + '</td><td>' + parcCount + '</td>';
+    html += '<td>' + idx.toFixed(2) + '</td>';
+    html += '<td><span class="level-badge ' + lvl.class + '">' + lvl.label + '</span></td>';
+    html += '<td>' + subjCount + '</td>';
+    html += '<td><button class="btn btn-blue" style="padding:6px 12px;font-size:0.8rem" onclick="viewStudentReport(' + s.id + ')">📄 Ver</button> ';
+    html += '<button class="btn btn-amber" style="padding:6px 12px;font-size:0.8rem" onclick="openUpdateModal(' + s.id + ')">🔄 Actualizar</button> ';
+    html += '<button class="btn btn-red" style="padding:6px 12px;font-size:0.8rem" onclick="deleteStudent(' + s.id + ')">🗑️</button></td></tr>';
   });
+  tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:#999">No hay estudiantes registrados</td></tr>';
+  
+  // Actualizar selects de comparación
+  var opts = '<option value="">Seleccionar estudiante</option>';
+  students.forEach(function(s) { opts += '<option value="' + s.id + '">' + s.name + '</option>'; });
+  document.getElementById('compareStudent1').innerHTML = opts;
+  document.getElementById('compareStudent2').innerHTML = opts;
+}
 
-  // Trend Chart (por fecha)
-  const byDate = {};
-  students.forEach(s => {
-    const date = s.date ? new Date(s.date).toLocaleDateString() : 'Sin fecha';
-    byDate[date] = (byDate[date] || 0) + 1;
+function filterStudents() { renderAllStudents(); }
+
+function deleteStudent(id) {
+  if(!confirm('¿Eliminar este estudiante?')) return;
+  students = students.filter(function(s) { return s.id !== id; });
+  showToast('Estudiante eliminado', 'success');
+  renderAllStudents();
+  renderDashboard();
+}
+
+function clearAllData() {
+  if(!confirm('¿Eliminar TODOS los estudiantes?')) return;
+  students = [];
+  showToast('Todos los datos han sido eliminados', 'success');
+  renderAllStudents();
+  renderDashboard();
+}
+
+// ============================================
+// ANÁLISIS
+// ============================================
+function renderAnalysis() {
+  var levels = {advanced:0, 'very-satisfactory':0, satisfactory:0, regular:0, low:0};
+  var totalIdx = 0;
+  var topStudents = [];
+  var riskStudents = [];
+  
+  students.forEach(function(s) {
+    var idx = calculateStudentIndex(s);
+    totalIdx += idx;
+    var lvl = getLevelFromIndex(idx);
+    levels[lvl.key]++;
+    
+    topStudents.push({name:s.name, index:idx});
+    if(idx < 70) riskStudents.push({name:s.name, index:idx});
   });
-
-  if (charts.trend) charts.trend.destroy();
-  charts.trend = new Chart(document.getElementById('trendChart'), {
-    type: 'line',
-    data: {
-      labels: Object.keys(byDate).slice(-10),
-      datasets: [{
-        label: 'Registros por Fecha',
-        data: Object.values(byDate).slice(-10),
-        borderColor: '#E8520A',
-        backgroundColor: 'rgba(232,82,10,0.1)',
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
+  
+  topStudents.sort(function(a,b) { return b.index - a.index; });
+  riskStudents.sort(function(a,b) { return a.index - b.index; });
+  
+  var total = students.length || 1;
+  var html = '<div style="display:flex;flex-direction:column;gap:10px">';
+  html += '<div style="display:flex;justify-content:space-between"><span>Avanzado:</span><strong>' + levels.advanced + ' (' + ((levels.advanced/total)*100).toFixed(1) + '%)</strong></div>';
+  html += '<div style="display:flex;justify-content:space-between"><span>Muy Satisfactorio:</span><strong>' + levels['very-satisfactory'] + ' (' + ((levels['very-satisfactory']/total)*100).toFixed(1) + '%)</strong></div>';
+  html += '<div style="display:flex;justify-content:space-between"><span>Satisfactorio:</span><strong>' + levels.satisfactory + ' (' + ((levels.satisfactory/total)*100).toFixed(1) + '%)</strong></div>';
+  html += '<div style="display:flex;justify-content:space-between"><span>Regular:</span><strong>' + levels.regular + ' (' + ((levels.regular/total)*100).toFixed(1) + '%)</strong></div>';
+  html += '<div style="display:flex;justify-content:space-between"><span>Bajo:</span><strong>' + levels.low + ' (' + ((levels.low/total)*100).toFixed(1) + '%)</strong></div>';
+  html += '</div>';
+  document.getElementById('levelDistribution').innerHTML = html;
+  
+  var avg = total > 0 ? (totalIdx / total).toFixed(2) : 0;
+  document.getElementById('sectionStats').innerHTML = '<div style="font-size:2rem;font-weight:900;color:var(--blue)">' + avg + '</div><div style="font-size:0.85rem;color:var(--text-soft)">Indice Promedio General</div>';
+  
+  var topHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
+  topStudents.slice(0, 5).forEach(function(s) {
+    topHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--green-bg);border-radius:6px"><span>' + s.name + '</span><strong style="color:var(--green)">' + s.index.toFixed(2) + '</strong></div>';
   });
-}
-
-function updateRecentTable(students) {
-  const tbody = document.getElementById('recentStudentsTable');
-  tbody.innerHTML = students.map(s => `
-    <tr>
-      <td><strong>${s.name}</strong></td>
-      <td>Sección ${s.section}</td>
-      <td>${s.pcial}° Parcial</td>
-      <td><strong>${s.index}</strong></td>
-      <td><span class="level-badge level-${s.level}">${formatLevel(s.level)}</span></td>
-      <td>${s.date ? new Date(s.date).toLocaleDateString() : '-'}</td>
-    </tr>
-  `).join('');
-}
-
-// ==================== GESTIÓN DE ESTUDIANTES ====================
-async function updateStudentsList() {
-  const students = await db.getAllStudents();
-  const tbody = document.getElementById('allStudentsTable');
-  tbody.innerHTML = students.map(s => `
-    <tr>
-      <td>#${s.id}</td>
-      <td class="student-name">${s.name}</td>
-      <td>Sección ${s.section}</td>
-      <td>${s.pcial}° Parcial</td>
-      <td class="grade-cell">${s.index}</td>
-      <td><span class="level-badge level-${s.level}">${formatLevel(s.level)}</span></td>
-      <td>${s.subjects ? s.subjects.length : 0} materias</td>
-      <td>
-        <button class="btn btn-blue" style="padding:6px 12px;font-size:0.8rem" onclick="viewStudent(${s.id})">👁️ Ver</button>
-        <button class="btn btn-red" style="padding:6px 12px;font-size:0.8rem" onclick="deleteStudent(${s.id})">🗑️ Eliminar</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-async function filterStudents() {
-  const search = document.getElementById('studentSearch').value.toLowerCase();
-  const section = document.getElementById('studentFilterSection').value;
-  const level = document.getElementById('studentFilterLevel').value;
-
-  const students = await db.getAllStudents();
-  const filtered = students.filter(s => {
-    const matchSearch = s.name.toLowerCase().includes(search);
-    const matchSection = !section || s.section === section;
-    const matchLevel = !level || s.level === level;
-    return matchSearch && matchSection && matchLevel;
+  topHtml += '</div>';
+  document.getElementById('topStudents').innerHTML = topHtml || '<div style="color:#999;text-align:center">No hay datos</div>';
+  
+  var riskHtml = '<div style="display:flex;flex-direction:column;gap:8px">';
+  riskStudents.slice(0, 5).forEach(function(s) {
+    riskHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--red-bg);border-radius:6px"><span>' + s.name + '</span><strong style="color:var(--red)">' + s.index.toFixed(2) + '</strong></div>';
   });
-
-  const tbody = document.getElementById('allStudentsTable');
-  tbody.innerHTML = filtered.map(s => `
-    <tr>
-      <td>#${s.id}</td>
-      <td class="student-name">${s.name}</td>
-      <td>Sección ${s.section}</td>
-      <td>${s.pcial}° Parcial</td>
-      <td class="grade-cell">${s.index}</td>
-      <td><span class="level-badge level-${s.level}">${formatLevel(s.level)}</span></td>
-      <td>${s.subjects ? s.subjects.length : 0} materias</td>
-      <td>
-        <button class="btn btn-blue" style="padding:6px 12px;font-size:0.8rem" onclick="viewStudent(${s.id})">👁️ Ver</button>
-        <button class="btn btn-red" style="padding:6px 12px;font-size:0.8rem" onclick="deleteStudent(${s.id})">🗑️ Eliminar</button>
-      </td>
-    </tr>
-  `).join('');
+  riskHtml += '</div>';
+  document.getElementById('riskStudents').innerHTML = riskHtml || '<div style="color:#999;text-align:center">No hay estudiantes en riesgo</div>';
 }
 
-async function filterDashboard() {
-  const search = document.getElementById('dashboardSearch').value.toLowerCase();
-  const level = document.getElementById('dashboardFilter').value;
-
-  const students = await db.getAllStudents();
-  const filtered = students.filter(s => {
-    const matchSearch = s.name.toLowerCase().includes(search);
-    const matchLevel = !level || s.level === level;
-    return matchSearch && matchLevel;
-  });
-
-  updateRecentTable(filtered.slice(-10).reverse());
+// ============================================
+// COMPARACIÓN
+// ============================================
+function renderComparison() {
+  updateComparison();
 }
 
-// ==================== ANÁLISIS DETALLADO ====================
-async function updateAnalysis() {
-  const stats = await db.getStats();
-  const students = await db.getAllStudents();
-
-  // Level Distribution
-  const levelDiv = document.getElementById('levelDistribution');
-  levelDiv.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${[
-        { label: 'Avanzado', value: stats.advanced, color: '#6621C2', total: stats.total },
-        { label: 'Muy Satisfactorio', value: stats.verySatisfactory, color: '#0B8B42', total: stats.total },
-        { label: 'Satisfactorio', value: stats.satisfactory, color: '#1A5CB8', total: stats.total },
-        { label: 'Regular', value: stats.regular, color: '#B45309', total: stats.total },
-        { label: 'Bajo', value: stats.low, color: '#C41C1C', total: stats.total }
-      ].map(item => `
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-weight:600;font-size:0.9rem">${item.label}</span>
-            <span style="font-weight:800">${item.value} (${((item.value/item.total)*100).toFixed(1)}%)</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width:${(item.value/item.total)*100}%;background:${item.color}"></div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  // Section Stats
-  const sectionDiv = document.getElementById('sectionStats');
-  sectionDiv.innerHTML = Object.entries(stats.bySection).map(([sec, list]) => {
-    const avg = list.length > 0 ? (list.reduce((a,b) => a + b.index, 0) / list.length).toFixed(1) : 0;
-    const best = list.length > 0 ? Math.max(...list.map(s => s.index)) : 0;
-    const worst = list.length > 0 ? Math.min(...list.map(s => s.index)) : 0;
-    return `
-      <div style="padding:12px;border-bottom:1px solid var(--bg)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <strong style="color:var(--blue)">Sección ${sec}</strong>
-          <span style="font-size:0.85rem;color:var(--text-soft)">${list.length} estudiantes</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;font-size:0.85rem">
-          <div>Promedio: <strong>${avg}</strong></div>
-          <div>Mejor: <strong style="color:var(--green)">${best}</strong></div>
-          <div>Peor: <strong style="color:var(--red)">${worst}</strong></div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  // Top Students
-  const topDiv = document.getElementById('topStudents');
-  const top5 = [...students].sort((a,b) => b.index - a.index).slice(0, 5);
-  topDiv.innerHTML = top5.map((s, i) => `
-    <div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--bg)">
-      <div style="width:28px;height:28px;background:linear-gradient(135deg,#E8520A,#FF7340);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.8rem">${i+1}</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:0.9rem">${s.name}</div>
-        <div style="font-size:0.8rem;color:var(--text-soft)">Sección ${s.section} • ${s.pcial}° Parcial</div>
-      </div>
-      <div style="font-weight:900;font-size:1.1rem;color:var(--green)">${s.index}</div>
-    </div>
-  `).join('');
-
-  // Risk Students
-  const riskDiv = document.getElementById('riskStudents');
-  const risk = students.filter(s => s.level === 'low' || s.level === 'regular').sort((a,b) => a.index - b.index).slice(0, 5);
-  riskDiv.innerHTML = risk.length > 0 ? risk.map(s => `
-    <div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--bg)">
-      <div style="width:28px;height:28px;background:var(--red-bg);color:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.8rem">⚠️</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:0.9rem">${s.name}</div>
-        <div style="font-size:0.8rem;color:var(--text-soft)">Sección ${s.section} • ${s.pcial}° Parcial</div>
-      </div>
-      <div style="font-weight:900;font-size:1.1rem;color:var(--red)">${s.index}</div>
-    </div>
-  `).join('') : '<div style="padding:20px;text-align:center;color:var(--text-soft)">🎉 No hay estudiantes en riesgo</div>';
-}
-
-// ==================== COMPARATIVA ====================
-async function updateComparisonOptions() {
-  const students = await db.getAllStudents();
-  const options = students.map(s => `<option value="${s.id}">${s.name} (Sección ${s.section} - ${s.index})</option>`).join('');
-
-  document.getElementById('compareStudent1').innerHTML = '<option value="">Seleccionar estudiante 1</option>' + options;
-  document.getElementById('compareStudent2').innerHTML = '<option value="">Seleccionar estudiante 2</option>' + options;
-}
-
-async function updateComparison() {
-  const id1 = document.getElementById('compareStudent1').value;
-  const id2 = document.getElementById('compareStudent2').value;
-
-  if (!id1 || !id2) return;
-
-  const students = await db.getAllStudents();
-  const s1 = students.find(s => s.id == id1);
-  const s2 = students.find(s => s.id == id2);
-
-  if (!s1 || !s2) return;
-
-  const result = document.getElementById('comparisonResult');
-  result.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px">
-      <div class="card" style="border-left:4px solid var(--blue)">
-        <h3 style="color:var(--blue);margin-bottom:16px">${s1.name}</h3>
-        <div style="display:grid;gap:8px">
-          <div style="display:flex;justify-content:space-between"><span>Sección:</span><strong>${s1.section}</strong></div>
-          <div style="display:flex;justify-content:space-between"><span>Parcial:</span><strong>${s1.pcial}°</strong></div>
-          <div style="display:flex;justify-content:space-between"><span>Índice:</span><strong style="color:var(--blue);font-size:1.2rem">${s1.index}</strong></div>
-          <div style="display:flex;justify-content:space-between"><span>Nivel:</span><span class="level-badge level-${s1.level}">${formatLevel(s1.level)}</span></div>
-        </div>
-      </div>
-      <div class="card" style="border-left:4px solid var(--orange)">
-        <h3 style="color:var(--orange);margin-bottom:16px">${s2.name}</h3>
-        <div style="display:grid;gap:8px">
-          <div style="display:flex;justify-content:space-between"><span>Sección:</span><strong>${s2.section}</strong></div>
-          <div style="display:flex;justify-content:space-between"><span>Parcial:</span><strong>${s2.pcial}°</strong></div>
-          <div style="display:flex;justify-content:space-between"><span>Índice:</span><strong style="color:var(--orange);font-size:1.2rem">${s2.index}</strong></div>
-          <div style="display:flex;justify-content:space-between"><span>Nivel:</span><span class="level-badge level-${s2.level}">${formatLevel(s2.level)}</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:20px;text-align:center">
-      <h3>Diferencia de Rendimiento</h3>
-      <div style="font-size:3rem;font-weight:900;color:${s1.index > s2.index ? 'var(--green)' : 'var(--red)'}">
-        ${Math.abs(s1.index - s2.index)} pts
-      </div>
-      <p style="color:var(--text-soft);margin-top:8px">
-        ${s1.index > s2.index ? s1.name : s2.name} tiene un rendimiento superior
-      </p>
-    </div>
-  `;
-}
-
-async function compareAll() {
-  const students = await db.getAllStudents();
-  const sorted = [...students].sort((a,b) => b.index - a.index);
-
-  const result = document.getElementById('comparisonResult');
-  result.innerHTML = `
-    <div class="card" style="margin-top:20px">
-      <div class="card-title"><span class="icon">🏆</span> Ranking General de Todos los Estudiantes</div>
-      <table class="data-table comparison-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Estudiante</th>
-            <th>Sección</th>
-            <th>Parcial</th>
-            <th>Índice</th>
-            <th>Nivel</th>
-            <th>Diferencia</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${sorted.map((s, i) => {
-            const diff = i > 0 ? (s.index - sorted[0].index) : 0;
-            return `
-              <tr style="${i === 0 ? 'background:linear-gradient(135deg,#FFF1EB,#FFF5F0)' : ''}">
-                <td><strong>${i+1}</strong></td>
-                <td class="student-name">${s.name}</td>
-                <td>${s.section}</td>
-                <td>${s.pcial}°</td>
-                <td class="grade-cell" style="color:${i === 0 ? 'var(--green)' : ''}">${s.index}</td>
-                <td><span class="level-badge level-${s.level}">${formatLevel(s.level)}</span></td>
-                <td style="color:${diff < 0 ? 'var(--red)' : 'var(--green)'}">${diff !== 0 ? diff : '-'}</td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-// ==================== CRUD OPERATIONS ====================
-async function saveNewStudent() {
-  const name = document.getElementById('newName').value;
-  const section = document.getElementById('newSection').value;
-  const parcial = document.getElementById('newParcial').value;
-  const index = parseFloat(document.getElementById('newIndex').value);
-
-  if (!name || isNaN(index)) {
-    showToast('Por favor complete todos los campos', 'error');
+function updateComparison() {
+  var id1 = document.getElementById('compareStudent1').value;
+  var id2 = document.getElementById('compareStudent2').value;
+  var result = document.getElementById('comparisonResult');
+  
+  if(!id1 || !id2) {
+    result.innerHTML = '<div style="text-align:center;color:#999;padding:40px">Seleccione dos estudiantes para comparar</div>';
     return;
   }
+  
+  var s1 = students.find(function(s) { return s.id == id1; });
+  var s2 = students.find(function(s) { return s.id == id2; });
+  
+  if(!s1 || !s2) return;
+  
+  var idx1 = calculateStudentIndex(s1);
+  var idx2 = calculateStudentIndex(s2);
+  
+  var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';
+  html += '<div class="card"><h3 style="font-size:1.2rem;margin-bottom:16px">' + s1.name + '</h3>';
+  html += '<div style="font-size:3rem;font-weight:900;color:var(--blue);text-align:center">' + idx1.toFixed(2) + '</div>';
+  html += '<div style="text-align:center;color:var(--text-soft)">Indice Academico</div></div>';
+  html += '<div class="card"><h3 style="font-size:1.2rem;margin-bottom:16px">' + s2.name + '</h3>';
+  html += '<div style="font-size:3rem;font-weight:900;color:var(--blue);text-align:center">' + idx2.toFixed(2) + '</div>';
+  html += '<div style="text-align:center;color:var(--text-soft)">Indice Academico</div></div>';
+  html += '</div>';
+  
+  var diff = idx1 - idx2;
+  var winner = diff > 0 ? s1.name : (diff < 0 ? s2.name : 'Empate');
+  html += '<div class="card" style="margin-top:20px;text-align:center"><h3>🏆 Resultado</h3>';
+  html += '<p style="font-size:1.2rem">' + winner + ' tiene mejor rendimiento</p>';
+  html += '<p style="color:var(--text-soft)">Diferencia: ' + Math.abs(diff).toFixed(2) + ' puntos</p></div>';
+  
+  result.innerHTML = html;
+}
 
-  const level = getLevelFromIndex(index);
+function compareAll() {
+  showToast('Comparando todos los estudiantes...', 'info');
+  // Implementar comparación masiva si es necesario
+}
 
-  await db.addStudent({
-    name,
-    section,
-    pcial: parcial,
-    index,
-    level,
-    subjects: []
+// ============================================
+// REGISTRO DE NUEVO ESTUDIANTE
+// ============================================
+var tempSubjects = [];
+
+function addSubjectCard() {
+  var container = document.getElementById('subjectsContainer');
+  var id = 'subj_' + Date.now();
+  var html = '<div class="subject-card" id="' + id + '">';
+  html += '<div class="subject-card-header"><h4>📚 <input type="text" placeholder="Nombre de asignatura" style="border:none;background:transparent;font-size:1rem;font-weight:800;color:var(--blue);width:200px" class="subj-name-input"></h4>';
+  html += '<button class="btn btn-red" style="padding:4px 10px;font-size:0.75rem" onclick="removeSubjectCard(\'' + id + '\')">✕</button></div>';
+  html += '<div class="parcial-row header-row"><div>Parcial</div><div>Mes</div><div>Nota</div><div></div></div>';
+  html += '<div class="parcial-rows" id="' + id + '_rows"></div>';
+  html += '<button class="btn btn-blue" style="margin:10px;padding:6px 14px;font-size:0.8rem" onclick="addParcialRow(\'' + id + '\')">➕ Agregar Parcial</button>';
+  html += '</div>';
+  container.insertAdjacentHTML('beforeend', html);
+  addParcialRow(id);
+}
+
+function removeSubjectCard(id) {
+  var el = document.getElementById(id);
+  if(el) el.remove();
+  updateCalculatedAverage();
+}
+
+function addParcialRow(subjId) {
+  var container = document.getElementById(subjId + '_rows');
+  var rowId = 'parcial_' + Date.now();
+  var html = '<div class="parcial-row" id="' + rowId + '">';
+  html += '<div><select class="parcial-num" style="padding:6px;border:1px solid #ddd;border-radius:6px"><option value="1">1er</option><option value="2">2do</option><option value="3">3er</option><option value="4">4to</option></select></div>';
+  html += '<div><select class="parcial-month" style="padding:6px;border:1px solid #ddd;border-radius:6px"><option value="Enero">Enero</option><option value="Febrero">Febrero</option><option value="Marzo">Marzo</option><option value="Abril">Abril</option><option value="Mayo">Mayo</option><option value="Junio">Junio</option><option value="Julio">Julio</option><option value="Agosto">Agosto</option><option value="Septiembre">Septiembre</option><option value="Octubre">Octubre</option><option value="Noviembre">Noviembre</option><option value="Diciembre">Diciembre</option></select></div>';
+  html += '<div><input type="number" class="parcial-grade" min="0" max="100" placeholder="0-100" style="padding:6px;border:1px solid #ddd;border-radius:6px;width:80px" onchange="updateCalculatedAverage()"></div>';
+  html += '<div><button class="btn btn-red" style="padding:4px 10px;font-size:0.75rem" onclick="removeParcialRow(\'' + rowId + '\')">✕</button></div>';
+  html += '</div>';
+  container.insertAdjacentHTML('beforeend', html);
+}
+
+function removeParcialRow(id) {
+  var el = document.getElementById(id);
+  if(el) el.remove();
+  updateCalculatedAverage();
+}
+
+function updateCalculatedAverage() {
+  var cards = document.querySelectorAll('.subject-card');
+  var totalAvg = 0, count = 0;
+  
+  cards.forEach(function(card) {
+    var grades = card.querySelectorAll('.parcial-grade');
+    var sum = 0, valid = 0;
+    grades.forEach(function(g) {
+      var v = parseFloat(g.value);
+      if(!isNaN(v)) { sum += v; valid++; }
+    });
+    if(valid > 0) { totalAvg += (sum / valid); count++; }
   });
+  
+  var avg = count > 0 ? (totalAvg / count) : 0;
+  document.getElementById('calculatedAverage').textContent = avg.toFixed(2);
+  document.getElementById('subjectsSummary').style.display = count > 0 ? 'block' : 'none';
+}
 
-  hideModal('newStudentModal');
-  showToast('Estudiante guardado exitosamente', 'success');
-
-  // Limpiar form
+function saveNewStudent() {
+  var name = document.getElementById('newName').value.trim();
+  var age = document.getElementById('newAge').value;
+  var grade = document.getElementById('newGrade').value.trim();
+  var school = document.getElementById('newSchool').value.trim();
+  var analystName = document.getElementById('newAnalystName').value.trim();
+  var analystRole = document.getElementById('newAnalystRole').value.trim();
+  var analystComment = document.getElementById('newAnalystComment').value.trim();
+  
+  if(!name) { showToast('❌ Ingrese el nombre del estudiante', 'error'); return; }
+  
+  var subjects = [];
+  var cards = document.querySelectorAll('.subject-card');
+  cards.forEach(function(card) {
+    var subjName = card.querySelector('.subj-name-input').value.trim();
+    if(!subjName) return;
+    
+    var parciales = [];
+    var rows = card.querySelectorAll('.parcial-row:not(.header-row)');
+    rows.forEach(function(row) {
+      var num = row.querySelector('.parcial-num').value;
+      var month = row.querySelector('.parcial-month').value;
+      var grade = parseFloat(row.querySelector('.parcial-grade').value);
+      if(!isNaN(grade)) {
+        parciales.push({num: parseInt(num), month: month, grade: grade});
+      }
+    });
+    
+    if(parciales.length > 0) {
+      subjects.push({name: subjName, parciales: parciales});
+    }
+  });
+  
+  var student = {
+    id: currentId++,
+    name: name,
+    age: age,
+    grade: grade,
+    school: school,
+    analystName: analystName,
+    analystRole: analystRole,
+    analystComment: analystComment,
+    subjects: subjects,
+    lastUpdate: new Date().toLocaleDateString('es-ES')
+  };
+  
+  students.push(student);
+  showToast('✅ Estudiante registrado exitosamente', 'success');
+  
+  // Limpiar formulario
   document.getElementById('newName').value = '';
-  document.getElementById('newIndex').value = '';
-
-  // Actualizar todo
-  updateDashboard();
-  updateStudentsList();
-  updateAnalysis();
-  updateComparisonOptions();
+  document.getElementById('newAge').value = '';
+  document.getElementById('newGrade').value = '';
+  document.getElementById('newSchool').value = '';
+  document.getElementById('newAnalystName').value = '';
+  document.getElementById('newAnalystRole').value = '';
+  document.getElementById('newAnalystComment').value = '';
+  document.getElementById('subjectsContainer').innerHTML = '';
+  document.getElementById('subjectsSummary').style.display = 'none';
+  
+  hideModal('newStudentModal');
+  renderDashboard();
+  renderAllStudents();
 }
 
-async function deleteStudent(id) {
-  if (!confirm('¿Está seguro de eliminar este estudiante?')) return;
-  await db.deleteStudent(id);
-  showToast('Estudiante eliminado', 'info');
-  updateDashboard();
-  updateStudentsList();
-  updateAnalysis();
-  updateComparisonOptions();
+// ============================================
+// ACTUALIZAR ESTUDIANTE
+// ============================================
+function openUpdateModal(id) {
+  updateStudentId = id;
+  var student = students.find(function(s) { return s.id === id; });
+  if(!student) return;
+  
+  document.getElementById('updateStudentName').textContent = student.name;
+  
+  var list = document.getElementById('updateSubjectList');
+  var html = '';
+  if(student.subjects) {
+    student.subjects.forEach(function(sub, idx) {
+      var avg = 0;
+      if(sub.parciales && sub.parciales.length > 0) {
+        var sum = 0;
+        sub.parciales.forEach(function(p) { sum += p.grade; });
+        avg = sum / sub.parciales.length;
+      }
+      html += '<div class="update-subject-item" onclick="selectSubjectForUpdate(' + idx + ')">';
+      html += '<span>' + sub.name + '</span>';
+      html += '<span style="font-weight:800;color:var(--green)">' + avg.toFixed(2) + '</span>';
+      html += '</div>';
+    });
+  }
+  list.innerHTML = html || '<div style="color:#999;text-align:center">No hay asignaturas</div>';
+  
+  document.getElementById('updateParcialForm').style.display = 'none';
+  showModal('updateStudentModal');
 }
 
-async function clearAllData() {
-  if (!confirm('¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.')) return;
-  await db.clearAll();
-  showToast('Todos los datos han sido eliminados', 'info');
-  updateDashboard();
-  updateStudentsList();
-  updateAnalysis();
-  updateComparisonOptions();
+function selectSubjectForUpdate(idx) {
+  selectedSubjectForUpdate = idx;
+  var student = students.find(function(s) { return s.id === updateStudentId; });
+  if(!student || !student.subjects[idx]) return;
+  
+  document.getElementById('updateSubjectName').textContent = student.subjects[idx].name;
+  document.getElementById('updateParcialForm').style.display = 'block';
+  
+  // Marcar seleccionado
+  document.querySelectorAll('.update-subject-item').forEach(function(el) { el.classList.remove('selected'); });
+  document.querySelectorAll('.update-subject-item')[idx].classList.add('selected');
 }
 
-function viewStudent(id) {
-  // Implementar vista detallada
-  showToast('Vista detallada en desarrollo', 'info');
+function saveUpdatedParcial() {
+  if(selectedSubjectForUpdate === null) return;
+  
+  var student = students.find(function(s) { return s.id === updateStudentId; });
+  if(!student) return;
+  
+  var num = parseInt(document.getElementById('updateParcialNum').value);
+  var month = document.getElementById('updateParcialMonth').value;
+  var grade = parseFloat(document.getElementById('updateParcialGrade').value);
+  
+  if(isNaN(grade)) { showToast('❌ Ingrese una nota válida', 'error'); return; }
+  
+  if(!student.subjects[selectedSubjectForUpdate].parciales) {
+    student.subjects[selectedSubjectForUpdate].parciales = [];
+  }
+  
+  student.subjects[selectedSubjectForUpdate].parciales.push({num: num, month: month, grade: grade});
+  student.lastUpdate = new Date().toLocaleDateString('es-ES');
+  
+  showToast('✅ Parcial agregado', 'success');
+  document.getElementById('updateParcialGrade').value = '';
+  openUpdateModal(updateStudentId);
+  renderDashboard();
+  renderAllStudents();
 }
 
-// ==================== EXPORT/IMPORT ====================
-async function exportData(format) {
-  const students = await db.getAllStudents();
+function saveNewSubjectToStudent() {
+  var student = students.find(function(s) { return s.id === updateStudentId; });
+  if(!student) return;
+  
+  var name = document.getElementById('newUpdateSubjectName').value.trim();
+  var num = parseInt(document.getElementById('newUpdateParcialNum').value);
+  var month = document.getElementById('newUpdateParcialMonth').value;
+  var grade = parseFloat(document.getElementById('newUpdateParcialGrade').value);
+  
+  if(!name || isNaN(grade)) { showToast('❌ Complete todos los campos', 'error'); return; }
+  
+  if(!student.subjects) student.subjects = [];
+  student.subjects.push({
+    name: name,
+    parciales: [{num: num, month: month, grade: grade}]
+  });
+  student.lastUpdate = new Date().toLocaleDateString('es-ES');
+  
+  showToast('✅ Asignatura agregada', 'success');
+  document.getElementById('newUpdateSubjectName').value = '';
+  document.getElementById('newUpdateParcialGrade').value = '';
+  openUpdateModal(updateStudentId);
+  renderDashboard();
+  renderAllStudents();
+}
 
-  if (format === 'json') {
-    const dataStr = JSON.stringify(students, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+// ============================================
+// REPORTE / HOJA DE RESULTADOS (PDF)
+// ============================================
+function viewStudentReport(id) {
+  var student = students.find(function(s) { return s.id === id; });
+  if(!student) return;
+  
+  var idx = calculateStudentIndex(student);
+  var lvl = getLevelFromIndex(idx);
+  
+  // Generar HTML del reporte
+  var html = '<div class="report-card">';
+  
+  // LOGOS CASM Y CCM
+  html += '<div class="report-logos">';
+  html += '<img src="' + LOGO_CASM_URL + '" alt="Logo CASM" class="report-logo" onerror="this.style.display=\'none\'">';
+  html += '<div class="report-logo-center"><h2 style="font-size:1.4rem;color:var(--text-dark);margin:0">📊 Analisis de Rendimiento Academico</h2><p style="color:var(--text-soft);margin:4px 0 0 0;font-size:0.9rem">CASM & CCM - Comision de Accion Social Menonita</p></div>';
+  html += '<img src="' + LOGO_CCM_URL + '" alt="Logo CCM" class="report-logo" onerror="this.style.display=\'none\'">';
+  html += '</div>';
+  
+  // ENCABEZADO
+  html += '<div class="report-header">';
+  html += '<h2>Reporte Individual del Estudiante</h2>';
+  html += '<div class="school-name">' + (student.school || 'Centro Educativo') + '</div>';
+  html += '<div class="report-date">Generado: ' + new Date().toLocaleDateString('es-ES', {year:'numeric', month:'long', day:'numeric'}) + '</div>';
+  html += '</div>';
+  
+  // PERFIL DEL ESTUDIANTE
+  html += '<div class="student-profile">';
+  html += '<div class="student-avatar">' + student.name.charAt(0).toUpperCase() + '</div>';
+  html += '<div class="student-info">';
+  html += '<h3>' + student.name + '</h3>';
+  html += '<p>📚 Grado: ' + (student.grade || 'N/A') + ' | 🎂 Edad: ' + (student.age || 'N/A') + ' años</p>';
+  html += '<p>🏫 ' + (student.school || 'Centro Educativo no especificado') + '</p>';
+  html += '</div></div>';
+  
+  // PUNTAJES
+  html += '<div class="score-display">';
+  html += '<div class="score-box primary"><div class="score-value">' + idx.toFixed(2) + '</div><div class="score-label">Indice Academico</div></div>';
+  html += '<div class="score-box secondary"><div class="score-value">' + lvl.label + '</div><div class="score-label">Nivel de Desempeno</div></div>';
+  html += '<div class="score-box tertiary"><div class="score-value">' + (student.subjects ? student.subjects.length : 0) + '</div><div class="score-label">Asignaturas</div></div>';
+  html += '</div>';
+  
+  // DETALLE POR ASIGNATURA
+  html += '<div class="section-box info">';
+  html += '<h4>📚 Detalle por Asignatura</h4>';
+  html += '<table class="subject-detail-table"><thead><tr><th>Asignatura</th><th>Parciales</th><th>Promedio</th><th>Nivel</th></tr></thead><tbody>';
+  
+  if(student.subjects) {
+    student.subjects.forEach(function(sub) {
+      var subAvg = 0;
+      var parcialStr = '';
+      if(sub.parciales && sub.parciales.length > 0) {
+        var sum = 0;
+        sub.parciales.forEach(function(p) {
+          sum += p.grade;
+          parcialStr += 'P' + p.num + ': ' + p.grade + ' ';
+        });
+        subAvg = sum / sub.parciales.length;
+      }
+      var subLvl = getLevelFromIndex(subAvg);
+      html += '<tr><td><strong>' + sub.name + '</strong></td>';
+      html += '<td>' + (parcialStr || 'Sin parciales') + '</td>';
+      html += '<td class="grade-cell ' + subLvl.class.replace('level-', 'grade-') + '">' + subAvg.toFixed(2) + '</td>';
+      html += '<td><span class="level-badge ' + subLvl.class + '">' + subLvl.label + '</span></td></tr>';
+    });
+  }
+  html += '</tbody></table></div>';
+  
+  // FORTALEZAS Y DEBILIDADES
+  html += '<div class="section-box">';
+  html += '<h4>✅ Fortalezas</h4><ul>';
+  if(idx >= 80) {
+    html += '<li>Excelente desempeno academico general</li>';
+    html += '<li>Mantiene un indice superior al 80%</li>';
+  } else if(idx >= 70) {
+    html += '<li>Buen desempeno en la mayoria de asignaturas</li>';
+  } else {
+    html += '<li>Potencial para mejorar con apoyo adecuado</li>';
+  }
+  html += '</ul></div>';
+  
+  html += '<div class="section-box warning">';
+  html += '<h4>⚠️ Areas de Mejora</h4><ul>';
+  if(idx < 70) {
+    html += '<li>Se recomienda refuerzo academico en asignaturas con bajo rendimiento</li>';
+    html += '<li>Establecer plan de seguimiento con docentes</li>';
+  } else if(idx < 80) {
+    html += '<li>Puede alcanzar nivel avanzado con mayor dedicacion</li>';
+  } else {
+    html += '<li>Mantener el excelente nivel de desempeno</li>';
+  }
+  html += '</ul></div>';
+  
+  // RECOMENDACIONES
+  html += '<div class="section-box">';
+  html += '<h4>💡 Recomendaciones</h4><ul>';
+  if(idx >= 90) {
+    html += '<li>Participar en programas de excelencia academica</li>';
+    html += '<li>Considerar tutorias para otros estudiantes</li>';
+  } else if(idx >= 80) {
+    html += '<li>Continuar con los habitos de estudio actuales</li>';
+    html += '<li>Buscar desafios adicionales en areas de interes</li>';
+  } else if(idx >= 70) {
+    html += '<li>Establecer horario de estudio mas estructurado</li>';
+    html += '<li>Solicitar apoyo en asignaturas con dificultades</li>';
+  } else {
+    html += '<li>Implementar plan de refuerzo academico inmediato</li>';
+    html += '<li>Coordinar reunion con padres y docentes</li>';
+    html += '<li>Evaluar posibles dificultades de aprendizaje</li>';
+  }
+  html += '</ul></div>';
+  
+  // SECCIÓN DEL ANALISTA (SIN FIRMAS DE TUTOR/DIRECTOR)
+  html += '<div class="analyst-section">';
+  html += '<h4>📝 Informacion del Analista</h4>';
+  html += '<div class="analyst-info">';
+  html += '<div><strong>Nombre:</strong> ' + (student.analystName || 'No especificado') + '</div>';
+  html += '<div><strong>Cargo:</strong> ' + (student.analystRole || 'No especificado') + '</div>';
+  html += '</div>';
+  
+  // COMENTARIOS DEL ANALISTA
+  html += '<h4 style="margin-top:16px">💬 Comentarios y Observaciones</h4>';
+  html += '<div class="analyst-comment">';
+  if(student.analystComment && student.analystComment.trim()) {
+    html += student.analystComment.replace(/\n/g, '<br>');
+  } else {
+    html += '<em style="color:var(--text-light)">Sin comentarios registrados.</em>';
+  }
+  html += '</div>';
+  html += '</div>';
+  
+  // PIE DE PÁGINA
+  html += '<div class="report-footer">';
+  html += '<p><strong>Comision de Accion Social Menonita (CASM)</strong></p>';
+  html += '<p>Comite Central Menonita (CCM)</p>';
+  html += '<p style="margin-top:8px">Este reporte es confidencial y tiene fines academicos.</p>';
+  html += '</div>';
+  
+  html += '</div>'; // report-card
+  
+  document.getElementById('reportContent').innerHTML = html;
+  document.getElementById('studentReportView').classList.add('active');
+}
+
+function closeReportView() {
+  document.getElementById('studentReportView').classList.remove('active');
+}
+
+function downloadReportPDF() {
+  window.print();
+}
+
+// ============================================
+// EXPORTAR / IMPORTAR
+// ============================================
+function exportData(format) {
+  if(students.length === 0) { showToast('❌ No hay datos para exportar', 'error'); return; }
+  
+  if(format === 'json') {
+    var dataStr = JSON.stringify(students, null, 2);
+    var blob = new Blob([dataStr], {type: 'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
-    a.download = `casm_ccm_estudiantes_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = 'estudiantes_casm_' + new Date().toISOString().split('T')[0] + '.json';
     a.click();
-    showToast('Datos exportados a JSON', 'success');
-  } else if (format === 'csv') {
-    const headers = ['ID', 'Nombre', 'Sección', 'Parcial', 'Índice', 'Nivel', 'Fecha'];
-    const rows = students.map(s => [s.id, s.name, s.section, s.pcial, s.index, s.level, s.date].join(','));
-    const csv = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    showToast('✅ Datos exportados en JSON', 'success');
+  } else if(format === 'csv') {
+    var csv = 'ID,Nombre,Edad,Grado,Centro,Indice,Nivel,Asignaturas,Analista,Cargo\n';
+    students.forEach(function(s) {
+      var idx = calculateStudentIndex(s);
+      var lvl = getLevelFromIndex(idx);
+      csv += s.id + ',"' + s.name + '",' + (s.age||'') + ',"' + (s.grade||'') + '","' + (s.school||'') + '",' + idx.toFixed(2) + ',"' + lvl.label + '",' + (s.subjects?s.subjects.length:0) + ',"' + (s.analystName||'') + '","' + (s.analystRole||'') + '"\n';
+    });
+    var blob = new Blob([csv], {type: 'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
-    a.download = `casm_ccm_estudiantes_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = 'estudiantes_casm_' + new Date().toISOString().split('T')[0] + '.csv';
     a.click();
-    showToast('Datos exportados a CSV', 'success');
+    showToast('✅ Datos exportados en CSV', 'success');
   }
 }
 
-async function importData(input) {
-  const file = input.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = async (e) => {
+function importData(input) {
+  var file = input.files[0];
+  if(!file) return;
+  
+  var reader = new FileReader();
+  reader.onload = function(e) {
     try {
-      const content = e.target.result;
-      let students;
-
-      if (file.name.endsWith('.json')) {
-        students = JSON.parse(content);
-      } else if (file.name.endsWith('.csv')) {
-        // Parse simple CSV
-        const lines = content.split('\n');
-        const headers = lines[0].split(',');
-        students = lines.slice(1).filter(l => l.trim()).map(line => {
-          const values = line.split(',');
-          return {
-            id: parseInt(values[0]),
-            name: values[1],
-            section: values[2],
-            pcial: values[3],
-            index: parseFloat(values[4]),
-            level: values[5],
-            date: values[6]
-          };
-        });
+      var ext = file.name.split('.').pop().toLowerCase();
+      if(ext === 'json') {
+        var data = JSON.parse(e.target.result);
+        if(Array.isArray(data)) {
+          students = data;
+          var maxId = 0;
+          students.forEach(function(s) { if(s.id > maxId) maxId = s.id; });
+          currentId = maxId + 1;
+          showToast('✅ ' + data.length + ' estudiantes importados', 'success');
+        }
+      } else if(ext === 'csv') {
+        showToast('⚠️ Importacion CSV en desarrollo', 'info');
       }
-
-      // Importar a la base de datos
-      for (const student of students) {
-        delete student.id; // Dejar que se genere nuevo ID
-        await db.addStudent(student);
-      }
-
-      showToast(`${students.length} estudiantes importados`, 'success');
-      updateDashboard();
-      updateStudentsList();
-      updateAnalysis();
-      updateComparisonOptions();
-    } catch (err) {
-      showToast('Error al importar: ' + err.message, 'error');
+      renderDashboard();
+      renderAllStudents();
+    } catch(err) {
+      showToast('❌ Error al importar: ' + err.message, 'error');
     }
   };
   reader.readAsText(file);
   input.value = '';
 }
 
-// ==================== UTILIDADES ====================
-function getLevelFromIndex(index) {
-  if (index >= 90) return 'advanced';
-  if (index >= 80) return 'very-satisfactory';
-  if (index >= 70) return 'satisfactory';
-  if (index >= 60) return 'regular';
-  return 'low';
-}
-
-function formatLevel(level) {
-  const levels = {
-    'advanced': 'Avanzado',
-    'very-satisfactory': 'Muy Satisfactorio',
-    'satisfactory': 'Satisfactorio',
-    'regular': 'Regular',
-    'low': 'Bajo'
-  };
-  return levels[level] || level;
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('content-' + tab).classList.add('active');
-
-  if (tab === 'dashboard') updateDashboard();
-  if (tab === 'students') updateStudentsList();
-  if (tab === 'analysis') updateAnalysis();
-  if (tab === 'comparison') updateComparisonOptions();
-}
-
-function showModal(id) {
-  document.getElementById(id).classList.add('active');
-}
-
-function hideModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
-function showToast(message, type = 'info') {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.className = 'toast show ' + type;
-  setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-// Cerrar modal al hacer click fuera
-document.querySelectorAll('.modal-overlay').forEach(modal => {
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('active');
-  });
+// ============================================
+// INICIALIZAR
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  // El login se muestra por defecto
 });
 </script>
 </body>
